@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Option</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 40px;
+        }
+        
+        .mcq-buttons-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .mcq-button-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .mcq-button {
+            padding: 15px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+            font-weight: bold;
+            flex: 1;
+        }
+        
+        .mcq-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .mcq-button:active {
+            transform: translateY(0);
+        }
+        
+        .mcq-button.editable {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        
+        .mcq-button-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+        
+        .rename-btn {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            padding: 0 5px;
+            margin-left: 5px;
+        }
+        
+        .rename-btn:hover {
+            opacity: 0.8;
+        }
+        
+        .edit-input {
+            width: 100%;
+            padding: 8px;
+            font-size: 16px;
+            border: 2px solid #667eea;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        
+        .result-btn {
+            padding: 8px 12px;
+            font-size: 13px;
+            border: none;
+            border-radius: 6px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.2s, box-shadow 0.2s;
+            width: 100%;
+        }
+        
+        .result-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(245, 87, 108, 0.4);
+        }
+        
+        .button-controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        
+        .btn {
+            padding: 12px 25px;
+            font-size: 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .btn-add {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-save {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+        }
+        
+        .btn-reset {
+            background: linear-gradient(135deg, #f5576c 0%, #f093fb 100%);
+            color: white;
+        }
+        
+        .btn-back {
+            background: #999;
+            color: white;
+        }
+        
+        .btn-back:hover {
+            background: #777;
+        }
+        
+        .subject-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 10px;
+            border: 2px solid #667eea;
+        }
+        
+        .subject-section h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+        
+        .subject-button {
+            display: inline-block;
+            position: relative;
+        }
+        
+        .subject-btn {
+            padding: 12px 25px;
+            font-size: 16px;
+            border: none;
+            border-radius: 6px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .subject-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .subject-dropdown {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: white;
+            border: 2px solid #667eea;
+            border-radius: 6px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            min-width: 150px;
+            margin-top: 5px;
+        }
+        
+        .subject-dropdown.active {
+            display: block;
+        }
+        
+        .subject-option {
+            padding: 12px 20px;
+            cursor: pointer;
+            color: #333;
+            border-bottom: 1px solid #e0e0e0;
+            transition: background 0.2s;
+            font-weight: 500;
+        }
+        
+        .subject-option:last-child {
+            border-bottom: none;
+        }
+        
+        .subject-option:hover {
+            background: #f0f0f0;
+            color: #667eea;
+        }
+        
+        .subject-display {
+            display: inline-block;
+            margin-left: 15px;
+            padding: 8px 15px;
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            border-radius: 6px;
+            font-weight: bold;
+            min-width: 100px;
+            
+        }
+      .btn-manage {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-manage:hover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 id="mainHeading">Welcome!</h1>
+        <div class="subtitle">Choose your subject and way to study today!</div>
+       
+        
+        <!-- Subject Selection -->
+        <div class="subject-section">
+            <h3>📚 Select Subject</h3>
+            <div class="subject-button">
+                <button class="subject-btn" id="subjectBtn">📖 Subject ▼</button>
+                <div class="subject-dropdown" id="subjectDropdown">
+                    <div class="subject-option" data-subject="Maths">Maths</div>
+                    <div class="subject-option" data-subject="Biology">Biology</div>
+                    <div class="subject-option" data-subject="Chemistry">Chemistry</div>
+                    <div class="subject-option" data-subject="Physics">Physics</div>
+                    <div class="subject-option" data-subject="Hindi">Hindi</div>
+                    <div class="subject-option" data-subject="English">English</div>
+                </div>
+            </div>
+            <span class="subject-display" id="selectedSubject">None Selected</span>
+        </div>
+        
+        <div class="mcq-buttons-grid" id="mcqContainer">
+            <div class="mcq-button-wrapper">
+                <button class="mcq-button" data-id="1">
+                    <span class="mcq-button-label">
+                        <span>Stopwatch</span>
+                        <button class="rename-btn" title="Rename">✎</button>
+                    </span>
+                </button>
+                <button class="result-btn" title="See Results">📊 Results</button>
+            </div>
+            <div class="mcq-button-wrapper">
+                <button class="mcq-button" data-id="2">
+                    <span class="mcq-button-label">
+                        <span>Timer</span>
+                        <button class="rename-btn" title="Rename">✎</button>
+                    </span>
+                </button>
+                <button class="result-btn" title="See Results">📊 Results</button>
+            </div>
+            <div class="mcq-button-wrapper">
+                <button class="mcq-button" data-id="3">
+                    <span class="mcq-button-label">
+                        <span>Pomodoro Technique</span>
+                        <button class="rename-btn" title="Rename">✎</button>
+                    </span>
+                </button>
+                <button class="result-btn" title="See Results">📊 Results</button>
+            </div>
+        </div>
+        
+        <div class="button-controls">
+            <button class="btn btn-save" id="saveOptions">Save Preferences</button>
+            <button class="btn btn-reset" id="resetBtn">Reset to Default</button>
+            <button class="btn btn-back" onclick="window.location.href='index.html'">← Back to Home</button>
+            <button class="btn btn-manage" onclick="window.location.href='todo.html'">Manage Tasks</button>
+        </div>
+    </div>
+    
+    <script>
+         let userName = localStorage.getItem("userName");
+
+    if (!userName) {
+        userName = prompt("Enter your name:");
+        if (userName && userName.trim() !== "") {
+            localStorage.setItem("userName", userName);
+        } else {
+            userName = "Student";
+        }
+    }
+
+    document.getElementById("mainHeading").innerText =
+        "Welcome, " + userName + "!";
+        // Subject Selection
+        let currentSubject = 'None Selected';
+        const subjectBtn = document.getElementById('subjectBtn');
+        const subjectDropdown = document.getElementById('subjectDropdown');
+        const selectedSubjectDisplay = document.getElementById('selectedSubject');
+        const subjectOptions = document.querySelectorAll('.subject-option');
+        
+        // Toggle dropdown
+        subjectBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            subjectDropdown.classList.toggle('active');
+        });
+        
+        // Handle subject selection
+        subjectOptions.forEach(option => {
+            option.addEventListener('click', (e) => {
+                e.stopPropagation();
+                currentSubject = option.getAttribute('data-subject');
+                selectedSubjectDisplay.textContent = '✓ ' + currentSubject;
+                subjectDropdown.classList.remove('active');
+                localStorage.setItem('selectedSubject', currentSubject);
+            });
+        });
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', () => {
+            subjectDropdown.classList.remove('active');
+        });
+        
+        // Load saved subject on page load
+        window.addEventListener('load', () => {
+            const savedSubject = localStorage.getItem('selectedSubject');
+            if (savedSubject) {
+                currentSubject = savedSubject;
+                selectedSubjectDisplay.textContent = '✓ ' + currentSubject;
+            }
+        });
+        
+        let mcqCounter = 4;
+        
+        function enableRenaming(button) {
+            const label = button.querySelector('.mcq-button-label span');
+            const originalText = label.textContent;
+            
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.className = 'edit-input';
+            input.value = originalText;
+            
+            label.replaceWith(input);
+            input.focus();
+            input.select();
+            
+            const saveRename = () => {
+                const newText = input.value.trim() || originalText;
+                const newLabel = document.createElement('span');
+                newLabel.textContent = newText;
+                input.replaceWith(newLabel);
+            };
+            
+            input.addEventListener('blur', saveRename);
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') saveRename();
+            });
+        }
+        
+        function attachRenameListener(button) {
+            const renameBtn = button.querySelector('.rename-btn');
+            if (renameBtn) {
+                renameBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    enableRenaming(button);
+                });
+            }
+        }
+        
+        function attachResultListener(resultBtn) {
+            resultBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                try {
+                    const wrapper = resultBtn.parentElement;
+                    const mcqButton = wrapper.querySelector('.mcq-button');
+                    const buttonName = mcqButton.querySelector('.mcq-button-label span:first-child').textContent.trim();
+                    console.log('Navigating to results for:', buttonName);
+                    window.location.href = 'data.html?set=' + encodeURIComponent(buttonName);
+                } catch (error) {
+                    console.error('Error in result button click:', error);
+                }
+            });
+        }
+        
+        function addMCQButton(name = null) {
+            mcqCounter++;
+            const buttonName = name || `MCQ Set ${mcqCounter}`;
+            
+            const wrapper = document.createElement('div');
+            wrapper.className = 'mcq-button-wrapper';
+            
+            const button = document.createElement('button');
+            button.className = 'mcq-button';
+            button.setAttribute('data-id', mcqCounter);
+            button.innerHTML = `
+                <span class="mcq-button-label">
+                    <span>${buttonName}</span>
+                    <button class="rename-btn" title="Rename">✎</button>
+                </span>
+            `;
+            
+            const resultBtn = document.createElement('button');
+            resultBtn.className = 'result-btn';
+            resultBtn.title = 'See Results';
+            resultBtn.textContent = '📊 Results';
+            
+            button.addEventListener('click', (e) => {
+                if (e.target.className !== 'rename-btn' && !e.target.classList.contains('rename-btn') && !e.target.classList.contains('result-btn')) {
+                    const buttonName = button.querySelector('.mcq-button-label span:first-child').textContent.trim();
+                    if (buttonName === 'Stopwatch') {
+                        window.location.href = 'stopwatch.html';
+                    } else if (buttonName === 'Timer') {
+                        window.location.href = 'Timer.html';
+                    } else if (buttonName === 'Pomodoro Technique') {
+                        window.location.href = 'Pomodoro.html';
+                    } else {
+                        alert(`You selected: ${buttonName}`);
+                    }
+                }
+            });
+            
+            attachRenameListener(button);
+            attachResultListener(resultBtn);
+            wrapper.appendChild(button);
+            wrapper.appendChild(resultBtn);
+            document.getElementById('mcqContainer').appendChild(wrapper);
+        }
+        
+        // Initialize existing buttons
+        function initializeButtons() {
+            document.querySelectorAll('.mcq-button').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    if (e.target.className !== 'rename-btn' && !e.target.classList.contains('rename-btn')) {
+                        const buttonName = button.querySelector('.mcq-button-label span:first-child').textContent.trim();
+                        if (buttonName === 'Stopwatch') {
+                            window.location.href = 'stopwatch.html';
+                        } else if (buttonName === 'Timer') {
+                            window.location.href = 'Timer.html';
+                        } else if (buttonName === 'Pomodoro Technique') {
+                            window.location.href = 'Pomodoro.html';
+                        } else {
+                            alert(`You selected: ${buttonName}`);
+                        }
+                    }
+                });
+                attachRenameListener(button);
+            });
+            
+            // Attach result listeners to result buttons
+            document.querySelectorAll('.result-btn').forEach(resultBtn => {
+                attachResultListener(resultBtn);
+            });
+        }
+        
+        // Initialize on DOM ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeButtons);
+        } else {
+            initializeButtons();
+        }
+        
+        // Add button functionality
+        document.getElementById('addBtn').addEventListener('click', () => {
+            addMCQButton();
+        });
+        
+        // Save functionality
+        document.getElementById('saveOptions').addEventListener('click', () => {
+            const buttons = document.querySelectorAll('.mcq-button');
+            const data = Array.from(buttons).map(btn => ({
+                id: btn.getAttribute('data-id'),
+                name: btn.querySelector('span:first-child').textContent
+            }));
+            localStorage.setItem('mcqData', JSON.stringify(data));
+            alert('Preferences saved!');
+        });
+        
+        // Reset functionality
+        document.getElementById('resetBtn').addEventListener('click', () => {
+            if (confirm('Reset to default MCQ sets?')) {
+                localStorage.removeItem('mcqData');
+                location.reload();
+            }
+        });
+        
+        // Load saved data
+        window.addEventListener('load', () => {
+            const saved = localStorage.getItem('mcqData');
+            if (saved) {
+                const data = JSON.parse(saved);
+                document.getElementById('mcqContainer').innerHTML = '';
+                mcqCounter = 0;
+                data.forEach(item => {
+                    addMCQButton(item.name);
+                });
+            }
+        });
+    </script>
+</body>
+</html>

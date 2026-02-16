@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sign Up | Stufo</title>
+  <link rel="stylesheet" href="signin.css"> <!-- reuse same CSS -->
+</head>
+<body>
+
+<div class="page">
+  <div class="card" style="text-align: center;" >
+    <h1>Create Account</h1>
+    <p >Start your focus journey with Stufo</p>
+
+    <form id="signupForm" onsubmit="handleSignup(event)">
+      <input type="text" id="name" placeholder="Full Name" required>
+      <br>
+      <br>
+      <input type="email" id="email" placeholder="Email" required>
+      <br>
+      <br>
+      <input type="password" id="password" placeholder="Password" required>
+<br>
+<br>
+
+      <button type="submit">Sign Up</button>
+    </form>
+
+    <span class="link">
+      Already have an account? <a href="signin.html">Sign in</a>
+    </span>
+  </div>
+</div>
+
+<script src="signu.js"></script>
+</body>
+</html>

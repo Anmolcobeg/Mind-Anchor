@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stopwatch</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            text-align: center;
+            min-width: 300px;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+        }
+        
+        .stopwatch-display {
+            font-size: 48px;
+            font-weight: bold;
+            color: #667eea;
+            margin: 30px 0;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 2px;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 12px 25px;
+            font-size: 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .btn-start {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+        }
+        
+        .btn-pause {
+            background: linear-gradient(135deg, #f5576c 0%, #f093fb 100%);
+            color: white;
+        }
+        
+        .btn-reset {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-back {
+            display: block;
+            margin-top: 20px;
+            background: #999;
+            color: white;
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⏱️ Stopwatch</h1>
+        
+        <div class="stopwatch-display" id="display">00:00:00</div>
+        
+        <div class="controls">
+            <button class="btn btn-start" id="startBtn">Start</button>
+            <button class="btn btn-pause" id="pauseBtn" disabled>Pause</button>
+            <button class="btn btn-reset" id="resetBtn">Reset</button>
+        </div>
+        
+        <button class="btn btn-back" onclick="window.location.href='focus.html'">← Back to main</button>
+    </div>
+    
+    <script>
+        let milliseconds = 0;
+        let seconds = 0;
+        let minutes = 0;
+        let hours = 0;
+        let isRunning = false;
+        let intervalId = null;
+        
+        const display = document.getElementById('display');
+        const startBtn = document.getElementById('startBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        
+        function updateDisplay() {
+            const h = String(hours).padStart(2, '0');
+            const m = String(minutes).padStart(2, '0');
+            const s = String(seconds).padStart(2, '0');
+            display.textContent = `${h}:${m}:${s}`;
+        }
+        
+        function start() {
+            if (!isRunning) {
+                isRunning = true;
+                startBtn.disabled = true;
+                pauseBtn.disabled = false;
+                
+                intervalId = setInterval(() => {
+                    milliseconds += 100;
+                    if (milliseconds >= 1000) {
+                        milliseconds = 0;
+                        seconds++;
+                    }
+                    if (seconds >= 60) {
+                        seconds = 0;
+                        minutes++;
+                    }
+                    if (minutes >= 60) {
+                        minutes = 0;
+                        hours++;
+                    }
+                    updateDisplay();
+                }, 100);
+            }
+        }
+        
+        function pause() {
+            if (isRunning) {
+                isRunning = false;
+                clearInterval(intervalId);
+                startBtn.disabled = false;
+                pauseBtn.disabled = true;
+                
+                // Save session data when paused
+                saveSessionData();
+            }
+        }
+        
+        function reset() {
+            clearInterval(intervalId);
+            isRunning = false;
+            milliseconds = 0;
+            seconds = 0;
+            minutes = 0;
+            hours = 0;
+            startBtn.disabled = false;
+            pauseBtn.disabled = true;
+            updateDisplay();
+        }
+        
+        startBtn.addEventListener('click', start);
+        pauseBtn.addEventListener('click', pause);
+        resetBtn.addEventListener('click', reset);
+        
+        updateDisplay();
+        
+        function saveSessionData() {
+            if (seconds > 0 || minutes > 0 || hours > 0) {
+                const totalMinutes = hours * 60 + minutes + (seconds > 0 ? 1 : 0);
+                const subject = localStorage.getItem('selectedSubject') || 'Not Specified';
+                const resultsKey = `results_Stopwatch`;
+                let results = [];
+                
+                const existingData = localStorage.getItem(resultsKey);
+                if (existingData) {
+                    try {
+                        results = JSON.parse(existingData);
+                    } catch (e) {
+                        results = [];
+                    }
+                }
+                
+                results.push({
+                    duration: totalMinutes,
+                    subject: subject,
+                    date: new Date().toLocaleDateString(),
+                    time: new Date().toLocaleTimeString()
+                });
+                
+                localStorage.setItem(resultsKey, JSON.stringify(results));
+            }
+        }
+    </script>
+</body>
+</html>

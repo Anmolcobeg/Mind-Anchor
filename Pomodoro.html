@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pomodoro Technique</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            text-align: center;
+            min-width: 300px;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .phase {
+            font-size: 18px;
+            color: #667eea;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        
+        .pomodoro-display {
+            font-size: 48px;
+            font-weight: bold;
+            color: #667eea;
+            margin: 30px 0;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 2px;
+        }
+        
+        .settings {
+            margin-bottom: 30px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .setting-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .setting-group label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .setting-group input {
+            width: 70px;
+            padding: 8px;
+            font-size: 14px;
+            border: 2px solid #667eea;
+            border-radius: 6px;
+            text-align: center;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 12px 25px;
+            font-size: 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .btn-start {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+        }
+        
+        .btn-pause {
+            background: linear-gradient(135deg, #f5576c 0%, #f093fb 100%);
+            color: white;
+        }
+        
+        .btn-reset {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-back {
+            display: block;
+            margin-top: 20px;
+            background: #999;
+            color: white;
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .phase.work {
+            color: #11998e;
+        }
+        
+        .phase.break {
+            color: #f5576c;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🍅 Pomodoro Technique</h1>
+        <div class="phase work" id="phase">Work Session</div>
+        
+        <div class="settings">
+            <div class="setting-group">
+                <label for="workMinutes">Work (min)</label>
+                <input type="number" id="workMinutes" min="1" max="60" value="25">
+            </div>
+            <div class="setting-group">
+                <label for="breakMinutes">Break (min)</label>
+                <input type="number" id="breakMinutes" min="1" max="60" value="5">
+            </div>
+        </div>
+        
+        <div class="pomodoro-display" id="display">25:00</div>
+        
+        <div class="controls">
+            <button class="btn btn-start" id="startBtn">Start</button>
+            <button class="btn btn-pause" id="pauseBtn" disabled>Pause</button>
+            <button class="btn btn-reset" id="resetBtn">Reset</button>
+        </div>
+        
+        <button class="btn btn-back" onclick="window.location.href='focus.html'">← Back to main</button>
+    </div>
+    
+    <script>
+        let isWorkSession = true;
+        let isRunning = false;
+        let remainingSeconds = 0;
+        let totalSeconds = 0;
+        let intervalId = null;
+        
+        const display = document.getElementById('display');
+        const phaseDisplay = document.getElementById('phase');
+        const startBtn = document.getElementById('startBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const workMinutesInput = document.getElementById('workMinutes');
+        const breakMinutesInput = document.getElementById('breakMinutes');
+        
+        function updateDisplay() {
+            const minutes = Math.floor(remainingSeconds / 60);
+            const seconds = remainingSeconds % 60;
+            
+            const m = String(minutes).padStart(2, '0');
+            const s = String(seconds).padStart(2, '0');
+            display.textContent = `${m}:${s}`;
+        }
+        
+        function startSession() {
+            const workMinutes = parseInt(workMinutesInput.value) || 25;
+            const breakMinutes = parseInt(breakMinutesInput.value) || 5;
+            
+            totalSeconds = isWorkSession ? workMinutes * 60 : breakMinutes * 60;
+            remainingSeconds = totalSeconds;
+            updateDisplay();
+        }
+        
+        function switchPhase() {
+            isWorkSession = !isWorkSession;
+            if (isWorkSession) {
+                phaseDisplay.textContent = 'Work Session';
+                phaseDisplay.classList.remove('break');
+                phaseDisplay.classList.add('work');
+            } else {
+                phaseDisplay.textContent = 'Break Time';
+                phaseDisplay.classList.remove('work');
+                phaseDisplay.classList.add('break');
+            }
+            startSession();
+        }
+        
+        function start() {
+            if (!isRunning) {
+                if (remainingSeconds === 0) {
+                    startSession();
+                }
+                
+                isRunning = true;
+                startBtn.disabled = true;
+                pauseBtn.disabled = false;
+                workMinutesInput.disabled = true;
+                breakMinutesInput.disabled = true;
+                
+                intervalId = setInterval(() => {
+                    remainingSeconds--;
+                    updateDisplay();
+                    
+                    if (remainingSeconds <= 0) {
+                        clearInterval(intervalId);
+                        isRunning = false;
+                        startBtn.disabled = false;
+                        pauseBtn.disabled = true;
+                        
+                        if (isWorkSession) {
+                            saveSessionData(totalSeconds / 60);
+                        }
+                        
+                        alert(`${isWorkSession ? 'Work' : 'Break'} session completed!`);
+                        switchPhase();
+                    }
+                }, 1000);
+            }
+        }
+        
+        function pause() {
+            if (isRunning) {
+                isRunning = false;
+                clearInterval(intervalId);
+                startBtn.disabled = false;
+                pauseBtn.disabled = true;
+            }
+        }
+        
+        function reset() {
+            clearInterval(intervalId);
+            isRunning = false;
+            isWorkSession = true;
+            startBtn.disabled = false;
+            pauseBtn.disabled = true;
+            workMinutesInput.disabled = false;
+            breakMinutesInput.disabled = false;
+            phaseDisplay.textContent = 'Work Session';
+            phaseDisplay.classList.remove('break');
+            phaseDisplay.classList.add('work');
+            startSession();
+        }
+        
+        startBtn.addEventListener('click', start);
+        pauseBtn.addEventListener('click', pause);
+        resetBtn.addEventListener('click', reset);
+        
+        // Initialize display
+        startSession();
+        
+        function saveSessionData(duration) {
+            const subject = localStorage.getItem('selectedSubject') || 'Not Specified';
+            const resultsKey = `results_Pomodoro Technique`;
+            let results = [];
+            
+            const existingData = localStorage.getItem(resultsKey);
+            if (existingData) {
+                try {
+                    results = JSON.parse(existingData);
+                } catch (e) {
+                    results = [];
+                }
+            }
+            
+            results.push({
+                duration: Math.round(duration),
+                subject: subject,
+                date: new Date().toLocaleDateString(),
+                time: new Date().toLocaleTimeString()
+            });
+            
+            localStorage.setItem(resultsKey, JSON.stringify(results));
+        }
+    </script>
+</body>
+</html>
